@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import './index.css';
+import GifList from './components/GifList';
+import SearchBar from './components/SearchBar';
+import request from 'superagent';
+import './styles/app.css';
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-);
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      gifs: []
+    };
+
+    this.handleTermChange = this.handleTermChange.bind(this);
+  }
+  handleTermChange(term) {
+    const url = `http://api.giphy.com/v1/gifs/search?q={term}&api_key=dc6zaTOxFJmzC`;
+
+    request.get(url, (err, res) => {
+      this.setState({ gifs: res.body.data })
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <SearchBar onTermChange={this.handleTermChange} />
+        <GifList gifs={this.state.gifs} />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
